@@ -1,6 +1,5 @@
-var t0 = performance.now();
-
-let sudoku = [
+var time = (new Date()).getTime();
+const puzzle = [
     [8, 0, 0, 0, 0, 0, 0, 0, 0],
     [0, 0, 3, 6, 0, 0, 0, 0, 0],
     [0, 7, 0, 0, 9, 0, 2, 0, 0],
@@ -9,66 +8,96 @@ let sudoku = [
     [0, 0, 0, 1, 0, 0, 0, 3, 0],
     [0, 0, 1, 0, 0, 0, 0, 6, 8],
     [0, 0, 8, 5, 0, 0, 0, 1, 0],
-    [0, 9, 0, 0, 0, 0, 4, 0, 0],
-]
-function sudokuRules(sudoku) {
-    sudoku.forEach((y, i) => {
-        line = []
-        y.forEach((v, index) => {
-            if (index % 1 == 0) line.push("|")
-            line.push(v)
-        })
-        console.log(line.join(""))
-    })
-    return true
-}
+    [0, 9, 0, 0, 0, 0, 4, 0, 0]
+];
 
-function sudokuResolver(sudoku, y, x, n) {
+// noBack = (board, y, x, n) => {
+//     for (let i = 0; i < 9; i++) {
+//         if (board[y][i] === n || board[i][x] === n) {
+//             return false;
+//         }
+//     }
+
+//     const axeX = Math.floor(x / 3) * 3;
+//     const axeY = Math.floor(y / 3) * 3;
+
+//     for (let caseX = 0; caseX < 3; caseX++) {
+//         for (let caseY = 0; caseY < 3; caseY++) {
+//             if (board[axeY + caseY][axeX + caseX] !== n && board[axeY + caseY][axeX + caseX] !== 0) {
+//                 return true;
+//             } else {
+//                 return false;
+//             }
+//         }
+//     }
+//     return true;
+// }
+
+sudokuRules = (board, y, x, n) => {
     for (let i = 0; i < 9; i++) {
-        if (sudoku[y][i] == n) {
-            return false
+        if (board[y][i] === n || board[i][x] === n) {
+            return false;
         }
     }
-    for (let i = 0; i < 9; i++) {
-        if (sudoku[i][x] == n) {
-            return false
-        }
-    }
-    x0 = Math.floor(x / 3) * 3
-    y0 = Math.floor(y / 3) * 3
-    for (let i = 0; i < 3; i++) {
-        for (let j = 0; j < 3; j++) {
-            if (sudoku[y0 + i][x0 + j] == n) {
-                return false
+
+    const axeX = Math.floor(x / 3) * 3;
+    const axeY = Math.floor(y / 3) * 3;
+
+    for (let caseX = 0; caseX < 3; caseX++) {
+        for (let caseY = 0; caseY < 3; caseY++) {
+            if (board[axeY + caseY][axeX + caseX] === n) {
+                return false;
             }
         }
     }
 
-    return true
+    return true;
 }
-let solution = 0
-function solve(sudoku) {
+
+sudokuResolver = (board) => {
     for (let y = 0; y < 9; y++) {
         for (let x = 0; x < 9; x++) {
-            if (sudoku[y][x] == 0) {
-                for (let n = 1; n < 10; n++) {
-                    if (sudokuResolver(sudoku, y, x, n)) {
-                        sudoku[y][x] = n
-                        solve(sudoku)
-                        sudoku[y][x] = 0
+            if (board[y][x] === 0) {
+                for (let n = 1; n <= 9; n++) {
+                    if (sudokuRules(board, y, x, n)) {
+                        board[y][x] = n;
+                        if (sudokuResolver(board)) {
+                            return board;
+                        }
                     }
                 }
-                return
+                board[y][x] = 0;
+                return false;
             }
         }
     }
 
-    sudokuRules(sudoku)
+    return board;
 }
-solve(sudoku)
+var html = '<table><tbody>';
 
-var t1 = performance.now();
-var progress = document.getElementById('progress')
-progress.innerHTML = "Le sudoku a pris " + (t1 - t0) + " ms."
-console.log("Le sudoku a pris " + (t1 - t0) + " ms.")
-console.log("Le sudoku a pris " + t1 + " ms.") 
+
+for (const element of sudokuResolver(puzzle)) {
+    html += "<tr>";
+
+    html += "<td>" + element[0] + '</td>';
+    html += "<td>" + element[1] + '</td>';
+    html += "<td>" + element[2] + '</td>';
+    html += "<td>" + element[3] + '</td>';
+    html += "<td>" + element[4] + '</td>';
+    html += "<td>" + element[5] + '</td>';
+    html += "<td>" + element[6] + '</td>';
+    html += "<td>" + element[7] + '</td>';
+    html += "<td>" + element[8] + '</td>';
+
+    html += "</tr>";
+}
+
+html += "</tbody></table>";
+
+document.getElementById("sudoku-resolver").innerHTML = html;
+
+finalTime = new Date().getTime() - time
+
+var time = document.getElementById('time')
+time.innerHTML = "Le sudoku a pris " + finalTime + " ms."
